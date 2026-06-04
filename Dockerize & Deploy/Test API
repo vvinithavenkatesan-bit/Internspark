@@ -1,7 +1,0 @@
-curl -X POST http://localhost:8080/api/employees \
--H "Content-Type: application/json" \
--d '{
-"name":"John Doe",
-"email":"john@example.com",
-"salary":50000
-}'
