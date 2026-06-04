@@ -1,0 +1,121 @@
+package com.example.employeeapi.service;
+
+import com.example.employeeapi.dto.EmployeeRequestDto;
+import com.example.employeeapi.dto.EmployeeResponseDto;
+import com.example.employeeapi.entity.Employee;
+import com.example.employeeapi.exception.ResourceNotFoundException;
+import com.example.employeeapi.repository.EmployeeRepository;
+
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+
+import org.mockito.InjectMocks;
+import org.mockito.Mock;
+import org.mockito.MockitoAnnotations;
+
+import java.util.Optional;
+
+import static org.junit.jupiter.api.Assertions.*;
+import static org.mockito.Mockito.*;
+
+class EmployeeServiceTest {
+
+    @Mock
+    private EmployeeRepository repository;
+
+    @InjectMocks
+    private EmployeeService service;
+
+    @BeforeEach
+    void setup() {
+        MockitoAnnotations.openMocks(this);
+    }
+
+    @Test
+    void shouldCreateEmployee() {
+
+        EmployeeRequestDto request =
+                new EmployeeRequestDto();
+
+        request.setName("John");
+        request.setEmail("john@test.com");
+        request.setSalary(50000.0);
+
+        Employee savedEmployee = new Employee(
+                1L,
+                "John",
+                "john@test.com",
+                50000.0
+        );
+
+        when(repository.save(any(Employee.class)))
+                .thenReturn(savedEmployee);
+
+        EmployeeResponseDto response =
+                service.create(request);
+
+        assertNotNull(response);
+        assertEquals(1L, response.getId());
+        assertEquals("John", response.getName());
+
+        verify(repository, times(1))
+                .save(any(Employee.class));
+    }
+
+    @Test
+    void shouldGetEmployeeById() {
+
+        Employee employee = new Employee(
+                1L,
+                "John",
+                "john@test.com",
+                50000.0
+        );
+
+        when(repository.findById(1L))
+                .thenReturn(Optional.of(employee));
+
+        EmployeeResponseDto response =
+                service.getById(1L);
+
+        assertEquals("John",
+                response.getName());
+
+        verify(repository)
+                .findById(1L);
+    }
+
+    @Test
+    void shouldThrowExceptionWhenEmployeeNotFound() {
+
+        when(repository.findById(1L))
+                .thenReturn(Optional.empty());
+
+        assertThrows(
+                ResourceNotFoundException.class,
+                () -> service.getById(1L)
+        );
+
+        verify(repository)
+                .findById(1L);
+    }
+
+    @Test
+    void shouldDeleteEmployee() {
+
+        Employee employee = new Employee(
+                1L,
+                "John",
+                "john@test.com",
+                50000.0
+        );
+
+        when(repository.findById(1L))
+                .thenReturn(Optional.of(employee));
+
+        service.delete(1L);
+
+        verify(repository)
+                .delete(employee);
+    }
+}
