@@ -1,0 +1,8 @@
+INSERT INTO employees
+(name, email, salary)
+VALUES
+('John Doe', 'john@example.com', 50000.00),
+
+('Jane Smith', 'jane@example.com', 65000.00),
+
+('Michael Brown', 'michael@example.com', 72000.00);
